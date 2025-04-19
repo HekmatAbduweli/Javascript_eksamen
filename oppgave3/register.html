@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff register</title>
+    <link href="style.css" rel="stylesheet" media="screen" />
+</head>
+
+<body>
+    <header>
+        <h1>Staff Register</h1>
+    </header>
+    <main>
+        <section id="list">
+            <nav id="filter">
+                <p>Filter on position:</p>
+                <ul id="positionFilter">
+                    <li><button class="all active">All positions</button></li>
+                </ul>
+            </nav>
+            <h2 id="listHeader">Showing all Staff</h2>
+            <div id="staffList">
+
+
+
+
+            </div>
+        </section>
+        <section id="admin">
+            <div class="form">
+                <h2>Add staff</h2>
+                <p>
+                    <label for="firstname">Firstname</label>
+                    <input type="text" name="firstname" id="firstname" placeholder="Firstname" />
+                </p>
+                <p>
+                    <label for="lastname">Lastname</label>
+                    <input type="text" name="lastname" id="lastname" placeholder="Lastname" />
+                </p>
+                <p>
+                    <label for="position">Position</label>
+                    <select id="position" name="postition">
+
+                    </select>
+                </p>
+                <p>
+                    <label for="department">Department</label>
+                    <select id="department" name="department">
+
+                    </select>
+                </p>
+                <p>
+                    <label for="email">Email address</label><input type="email" name="email" id="email"
+                        placeholder="you@email.com" /></select>
+                </p>
+                <button id="saveStaff">Save staff member</button>
+            </div>
+            <div class="form">
+                <h2>Add position</h2>
+                <p>
+                    <label for="newPosition">Position</label><input type="text" name="newPosition" id="newPosition"
+                        placeholder="Position" />
+                </p>
+                <button id="savePosition" onclick="newPosition()">Save new position</button>
+            </div>
+            <div class="form">
+                <h2>Add department</h2>
+                <p>
+                    <label for="newDepartment">Department</label><input type="text" name="newDepartment"
+                        id="newDepartment" placeholder="Department" />
+                </p>
+                <button id="saveDepartment">Save new department</button>
+            </div>
+        </section>
+    </main>
+    <script>
+        //Array of staff objects
+        const staff = [
+            { firstname: "Bill", lastname: "Gates", position: "Director", department: "Administration", email: "bill@gates.net" },
+        ]
+
+        //Array of available positions
+        const positions = ["Director", "Team_leader", "Producer", "Engineer", "Designer"]
+        //funksjon for å få options i posisjon dropdown element
+        function createPosition() {
+            //tømmer alle element inne i element (som id heter position)
+            document.getElementById("position").innerHTML = ""
+            //denne funksjon fjerner alle li tag som har generert av js(Javascript)
+            // inspirerte fra stackoverflow av Simple ES6 (https://stackoverflow.com/questions/10842471/how-to-remove-all-elements-of-a-certain-class-from-the-dom)
+            const positionButton = document.querySelectorAll(".single").forEach((li) => {
+                li.remove()
+            })
+
+            //sorterer elementene i lista fra a-å 
+            positions.sort()
+            //skriver ut elementer
+            for (let i = 0; i < positions.length; i++) {
+                document.getElementById("position").innerHTML += `<option value="${positions[i]}">${positions[i]}</option>` //i ${} delen legger positions[i] får å legge element fra listen
+                document.getElementById("positionFilter").innerHTML += `<li class="single"><button class="${positions[i]}">${positions[i]}</button></li>`
+            }
+            //kjører updateFilterBtn funksjon slik den nye filter knappen få opp
+            updateFilterBtn()
+        }
+        //kjører createPosition funksjon
+        createPosition()
+
+        //Array of available departments
+        const departments = ["Administration", "Human Resources", "Production", "Finances"]
+        //funksjon for å få options i department dropdown element
+        //funksjonen funker samme som createPosition()
+        function createDepartment() {
+            document.getElementById("department").innerHTML = ""
+            departments.sort()
+            for (let i = 0; i < departments.length; i++) {
+                document.getElementById("department").innerHTML += `<option value="${departments[i]}">${departments[i]}</option>`
+            }
+        }
+        createDepartment()
+
+        //her brukte jeg chat gpt fordi jeg kunne ikke kjøre denne funksjon etter filter knappene har opdatert etter jeg har opprettet nt stilling i skjema
+        //ved å gi slike funksjon sikrer funksjonen kan legges til for alle filterknapper
+        //denne funksjon filterer pasjonale basert på stilling
+        function updateFilterBtn() {
+            //har spurt chat gpt at hvordan kan jeg endre fargen til grå til de knappene som har blitt tyrkket og endre fargen til grønn til den knappen som var grå før
+            //henter forrige knapp som hadde active class navn her. //gå til 135
+            let previousButton = document.querySelector(".all")
+            //her har jeg inspirerte fra stack overflow for å hente button fra li som er fra innside til ul(altså jeg mener: ul>li>button)
+            //https://stackoverflow.com/questions/65843313/how-to-tell-javascript-getelementbyclassname-to-get-all-the-element-of-a-ul-ins
+            document.querySelectorAll("ul#positionFilter li button").forEach((e) => {//forEach funksjon ligner på map og for loop 
+                //funksjonen kjører når en av filter knappen trykkes.
+                e.addEventListener("click", () => {
+                    //skjekker om det previousButton er ikke null
+                    if (previousButton) {
+                        //hivs det finnes en sånne fjerner det fra class listen //gå til 160
+                        previousButton.classList.remove("active")
+                    }
+                    const classList = e.classList.item(0)//henter bare første class fra hver element
+                    const memberCard = document.querySelectorAll(".membercard")
+                    let count = 0 //bruker count for å telle hvor mange som ansatter er fortsatt finnes etter filtering
+                    for (let i = 0; i < memberCard.length; i++) { // her filterer ansattlistn
+                        const dataMaterial = memberCard[i].getAttribute("data-material")
+                        if (classList === "all" || classList === dataMaterial) {
+                            //filterer ved å gi display="none" til element som er ikke blitt valgt og display="block" for de som har valgt
+                            memberCard[i].style.display = "block"
+                            count++// count øker i henhold til gjenstående beløp.
+                        } else {
+                            memberCard[i].style.display = "none"
+                        }
+                        //skjekker om knappen er all options eller ikke
+                        if (classList === "all") {
+                            document.getElementById("listHeader").innerText = `Showing all Staff`
+                        } else {
+                            //skriver ut antall ansatte og stilling hvis filterings knappen er ikke all positions
+                            document.getElementById("listHeader").innerText = `Showing ${count} employee with position ${classList}`
+                        }
+                    }
+                    //etter knappen har trykt legger active i classe til den knappen som har trykt
+                    e.classList.add("active")
+                    //legger den knappen som har trykt til previous variabel så neste gang når andre knappen trykkes fjerner class navn active fra knappen
+                    previousButton = e
+                })
+            })
+        }
+        updateFilterBtn()
+
+
+        //funksjon er for å opprette ny stilling
+        function newPosition() {
+            //lager en variabler og den skal hente verdien fra input(som id heter newPosition)
+            // grunnen til jeg bruker let er for å endre store og smo bokstavene til input(f.eks heLlo -> Hello) 
+            let input = document.getElementById("newPosition").value
+            //skjekker om verdien til input er tom eller ikke
+            //hvis verdien i input variabel er tom gir varsler
+            if (!input) {
+                alert("You must enter a position to be able to save!")
+            } else {
+                //ellers opretter en ny stilling, men før det, skal skjekke om det finnes allereden en element i array
+                input = input[0].toUpperCase() + input.slice(1).toLowerCase()//her endrer første alfabeten til uppercase og resten til lower case
+
+                //hvis input verdien finnes ikke i positions liste pusher ut verdien til positions
+                if (!positions.includes(input)) {
+                    positions.push(input)
+                    //kjøre createPosition på nytt for at den nye stilling dukker opp i dropdown meny og legge ny knapp i filter menyen
+                    createPosition()
+                } else {
+                    alert("It's already exist!")
+                }
+
+            }
+            console.log(positions);
+
+        }
+
+        //funksjon er for å opprette ny avdeling
+        //funksjonen funker akkurat samme som newPosition funksjon, men her er for departement
+        function newDepartment() {
+            let input = document.getElementById("newDepartment").value
+            //hvis det er tom git varsling
+            if (!input) {
+                alert("You must enter a department to be able to save!")
+            } else {
+                input = input[0].toUpperCase() + input.slice(1).toLowerCase()//endrer første alfabeten til uppercase og resten til lower case
+                if (!departments.includes(input)) {
+                    departments.push(input)
+                    createDepartment()
+                } else {//hvis det finnes allerede en som er slike som verdien til input gir ut varsling
+                    alert("It's already exist!")
+                }
+
+            }
+        }
+        document.getElementById("saveDepartment").addEventListener("click", () => {
+            newDepartment()
+        })
+
+
+        //her pusher ut ny ansattes informasjon til staff listen
+        //funksjonen funker når save staff funksjon trykkes
+        document.getElementById("saveStaff").addEventListener("click", () => {
+            //her samler valuen fra skjema
+
+            let FirstName = document.getElementById("firstname").value
+            let LastName = document.getElementById("lastname").value
+            const PositionValue = document.getElementById("position").value
+            const DepartmentValue = document.getElementById("department").value
+            const EmailAddress = document.getElementById("email").value
+
+            //her skjekker om noen skjema er tom eller ikke. hvis en av de er tom får mar varsling.
+            if (FirstName === "" || LastName === "" || PositionValue === "" || DepartmentValue === "" || EmailAddress === "") {
+                alert("Fill the schema!")
+                //hvis ingen av skjema er tom pusher da ut informasjon til staff list og kjører showingStaff() funksjon på nytt
+            } else {
+                // første navn og etter navn bruker let for å endre første alfabet til uppercase og resten til lowercase
+                FirstName = FirstName[0].toUpperCase() + FirstName.slice(1).toLowerCase()
+                LastName = LastName[0].toUpperCase() + LastName.slice(1).toLowerCase()
+                staff.push({ firstname: FirstName, lastname: LastName, position: PositionValue, department: DepartmentValue, email: EmailAddress })
+                //denne funksjon sorterer alfabetene fra a-å
+                // jeg har inspirerte denne funksjon fra mdn web docs
+                //(kilde: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#sorting_array_of_objects)
+                staff.sort((a, b) => {
+                    //disse to variabler er å ignore upper og lowercase
+                    const nameA = a.lastname.toUpperCase()
+                    const nameB = b.lastname.toUpperCase()
+                    //hvis name a er mindre enn name b bytter plassen
+                    if (nameA < nameB) {//fra :Bravo, Alpha til Alpha, Bravo
+                        return -1;
+                    }
+                    //hvis name a er større enn name b beholder plassen
+                    if (nameA > nameB) {
+                        return +1
+                    }
+                    //hvis begge to er like endres ingenting
+                    return 0//f.eks Alpha, Apple
+                })
+                //kjører showingStaff slik dropdown opdateres og få det nye element vises
+                showingStaff()
+            }
+        })
+
+
+        function showingStaff() {
+            //her tømmer alle elementer som er i stafflist først
+            //Jeg har brukt chat gpt for å vite hvordan skal jeg legge den ny staff uten å spamme. siden funksjonen har kjørt en gnag allerere når websiden ble opent
+            const staffList = document.getElementById("staffList")
+            staffList.innerHTML = ""
+
+
+
+            //her mapper staff array for å få tilgang til de andre objektene og gjelde den funksjon til alle objekter som er i listen
+            staff.map((list) => {
+                const firstName = list.firstname
+                const lastName = list.lastname
+                const position = list.position
+                const department = list.department
+                const email = list.email
+                //her lager profil og plasserer informasjonene i riktig sted
+                staffList.innerHTML +=
+                    `<article class="membercard" data-material="${position}" id="staffmember-0">
+                <h3>${lastName}, ${firstName}</h3>
+                <p class="metainfo">
+                    <img src="posicon.png" alt="position: "> ${position}
+                    <img src="depicon.png" alt="department: "> ${department}
+                </p>
+                <p><a href="${email}"><img src="mailicon.png"> Send mail to ${firstName}</a></p>
+            </article>`
+            })
+        }
+
+        //kjører showingstaff funksjon
+        showingStaff()
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eksamen oppgave 1: Kalkulator</title>
+    <link rel="stylesheet" href="font/stylesheet.css">
+    <link rel="stylesheet" href="oppgave1style.css">
+</head>
+
+<body>
+    <article>
+        <input type="text" id="calculation" />
+        <div id="keyboard">
+            <div id="numbers">
+                <button id="number-1" value="1" onClick="display('1')">1</button>
+                <button id="number-2" value="2" onClick="display('2')">2</button>
+                <button id="number-3" value="3" onClick="display('3')">3</button>
+                <button id="number-4" value="4" onClick="display('4')">4</button>
+                <button id="number-5" value="5" onClick="display('5')">5</button>
+                <button id="number-6" value="6" onClick="display('6')">6</button>
+                <button id="number-7" value="7" onClick="display('7')">7</button>
+                <button id="number-8" value="8" onClick="display('8')">8</button>
+                <button id="number-9" value="9" onClick="display('9')">9</button>
+                <button id="number-comma" value="." onClick="display(',')">,</button>
+                <button id="number-0" value="0" onClick="display('0')">0</button>
+                <button id="control-clear" onClick="clearScreen()">C</button>
+
+            </div>
+            <div id="controls">
+                <button id="control-plus" value="+" onClick="display('+')">+</button>
+                <button id="control-minus" value="-" onClick="display('-')">-</button>
+                <button id="control-multiply" value="*" onClick="display('*')">*</button>
+                <button id="control-multiply" value="/" onClick="display('/')">/</button>
+                <button id="control-equal" value="=" onClick="solve()">=</button>
+            </div>
+        </div>
+        <div id="memory">
+            <p>Memory (<span id="memory-bank">0</span>)</p>
+            <button id="memory-add" onclick="addMemory()">Add</button>
+            <button id="memory-browseback" disabled>Previous</button>
+            <button id="memory-browseforward" disabled>Next</button>
+        </div>
+    </article>
+
+    <script>
+        //problem 2 type error not "getElementByI'D'"
+        let calculationDisplay = document.getElementById("calculation")
+        let memory = []
+        let memoryBank = 0
+        const previousButton = document.getElementById("memory-browseback")
+        const nextButton = document.getElementById("memory-browseforward")
+
+        //problem 1 type error not "displey"
+        function display(val) {
+            //problem 3 type error not "calculatin"
+            calculationDisplay.value += val
+            return val
+        }
+
+        function solve() {
+            //problem 4  type error not "value()"
+            let result = eval(calculationDisplay.value)
+            //problem 5 type error not "results"
+            document.getElementById("calculation").value = result
+            return result
+        }
+        // function solve() kjører når "=" knappen trykkes.
+        // funksjonen henter verdien fra input som id heter "calculation" og gir variabler som heter calcutaltion.
+        // deretter lager en annen variabler som heter result og denne variablen kalkulerer ved å bruke eval() funksjon-
+        // eval() funksjon evaluerer eller utfører en argument, denne funksjon kan risikere sikkerheten(ressuser fra w3school)
+        // deretter sender resultaten fra "result"-varuabel til input (som id heter "calculation")
+
+        //når C knappen trykkes, koden fjerner tallene på skjermen i kalkulator
+        function clearScreen() {
+            calculationDisplay.value = ""
+        }
+
+
+
+
+        function addMemory() {
+            memory.push(calculationDisplay.value)
+            console.log(memory);
+            memoryBank++
+            console.log(memory.length);
+            document.getElementById("memory-bank").innerHTML = memoryBank
+            // Jeg har søkt om hvordan deaktivere disabled egenskap ved javascript og fant svar fra stackoverflow
+            // kilde (https://stackoverflow.com/questions/11719961/javascript-remove-disabled-attribute-from-html-input)
+            document.getElementById("memory-browseback").disabled = false
+        }
+
+        //funksjonen for previout knappen og funker bare når previous knappen tykkes
+        previousButton.addEventListener("click", () => {
+            //verdien til memoryBank øker ned for å vise tidligere regningen som har lagret
+
+
+            if (memoryBank > 0) {
+                memoryBank -= 1
+                calculationDisplay.value = memory[memoryBank]
+                previousButton.disabled = false
+                //previous knappen blir deaktivert hvis verdien til memoryBank er null
+            } if (memoryBank === 0) {
+                calculationDisplay.value = memory[memoryBank]
+                previousButton.disabled = true
+            }
+            console.log(memoryBank);
+
+            if (memoryBank < memory.length - 1) {
+                nextButton.disabled = false
+            }
+
+        })
+
+        //funksjonen for next knappen og funker bare når next knappen tykkes
+        nextButton.addEventListener("click", () => {
+            //next knappen fortsetter når verdien til memorybank er midre enn memory lengden men minus 1
+            if (memoryBank < memory.length - 1) {
+                memoryBank += 1
+                calculationDisplay.value = memory[memoryBank]
+                nextButton.disabled = false
+            }
+            //next knappen deaktiveres når verdien til memorybank blir like som memory lengden men minus 1
+            //grunnen til .length-1 er fordi ".length" starter ikke fra 0
+            //derfor må lengden til memory stoppe et skritt foran for å deaktivere next knappen 
+            if (memoryBank === memory.length - 1) {
+                nextButton.disabled = true
+            }
+            console.log(memoryBank);
+
+            if (memoryBank > 0) {
+                previousButton.disabled = false
+            }
+        })
+
+    </script>
+</body>
+
+</html>

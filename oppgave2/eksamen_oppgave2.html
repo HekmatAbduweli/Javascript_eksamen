@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eksamen i Innføring i Programmering - oppgave 2</title>
+    <link rel="stylesheet" href="oppgave2style.css">
+</head>
+
+<body>
+    <main>
+        <nav>
+            <h2>Controls</h2>
+            <p><span class="buttonIllustration" id="sbutton">S</span> Add a square</p>
+            <p><span class="buttonIllustration" id="cbutton">C</span> Add a circle</p>
+            <p><span class="buttonIllustration" id="rbutton">R</span> Remove random element</p>
+            <h2>Number of elements</h2>
+            <ul>
+                <li>Squares: <span id="squareCount">0</span></li>
+                <li>Circles: <span id="circleCount">0</span></li>
+                <li>Total: <span id="totalCount">0</span></li>
+            </ul>
+            <h2>Activity:</h2>
+            <p>user has been alive for
+                <span id="timer">0</span>
+                seconds, which is
+                <span id="avgPersec">0.00000012023</span>
+                element per second
+            </p>
+        </nav>
+        <canvas id="drawArea"></canvas>
+    </main>
+
+    <script>
+        //INITIATE CANVAS
+        //Canvas width: 600, Canvas height: 500
+        const canvas = document.getElementById("drawArea")
+        canvas.width = 600
+        canvas.height = 500
+        const ctx = canvas.getContext("2d")
+
+        //TODO: Storage of multiple element objects (Grade C and above)
+        const elements = [
+            { type: "square", x: 23, y: 220 },
+            { type: "circle", x: 381, y: 444 }
+        ]
+
+        //TODO: Function to add an element of parameter type 'square' or 'circle':
+
+        //funksjon for å lage en tilfeldig nummer
+        //her har jeg inspirerte tore sin workshop for å oprette randomnummer 
+        //kilde https://github.com/toremake/innfprog/blob/main/workshops/workshop5/ws5_solution.html#L103
+        function randomMinmax(min, max) {
+            return Math.floor(Math.random() * max + min)
+        }
+
+        //dette er hoved funksjon lager objekt og gir tilfeldig x-akse(mellom 0 til 600) og y-akse(mellom 0 til 500)
+        //funksjonen bruker params for å slippe å lage to funksjon for sirkel og firekant
+        // her har jeg inspirerte tore sin workshop for å lage funksjon for å skrive ut opdatering til et element
+        //kilde https://github.com/toremake/innfprog/blob/main/workshops/workshop5/ws5_solution.html#L128 
+        function generateObject(shape, variable, id) {
+            elements.push({ type: shape, x: randomMinmax(0, 600), y: randomMinmax(0, 500) })
+            document.getElementById(id).innerText = variable
+            updateTotalNumber()
+            elementAddedPerSecond +=1
+        }
+
+        //TODO: Function to remove random element:
+        function deleteRandomObject() {
+            //har inspirerte koden fra https://sentry.io/answers/remove-specific-item-from-array/#the-splice-method for å fjerne en element fra list
+            let removed = elements.splice(randomMinmax(0, elements.length), 1)
+            //her skjekker om det er sirkel eller firekant og tellerne som viser antall objekt opdateres
+            removed.map((item) => {
+                let type = item.type
+                if (type === "square") {
+                    squareNumber -= 1
+                    document.getElementById("squareCount").innerText = squareNumber
+                } else if (type === "circle") {
+                    circleNumber -= 1
+                    document.getElementById("circleCount").innerText = circleNumber
+                }
+            })
+            updateTotalNumber()
+            elementAddedPerSecond -= 1
+        }
+
+        //TODO: EventListeners to track user input:
+
+        //funksjon for å tracke museklikk for hver "s","c","r" knapper
+        document.getElementById("sbutton").addEventListener("click", () => {
+            // ved å legge tre infomasjon som er type til objekt, navnet til konstant variabler som skal opdateres og id for å opdatere tller, inne i parantes lager funksjonen objekt og pusher den til element array
+            //her genererer firekant
+            //koden til funksjonen ligger i linje 51
+            generateObject("square", squareNumber += 1, "squareCount")
+        })
+
+        document.getElementById("cbutton").addEventListener("click", () => {
+            //samme ting som er i linje 78 skjer her, mer her genererer sirkel
+            generateObject("circle", circleNumber += 1, "circleCount")
+        })
+        document.getElementById("rbutton").addEventListener("click", () => {
+            // denne er funksjon for å fjerne tilfeldig objekt fra "elements" array.
+            //koden til funksjonen ligger i linje 57
+            deleteRandomObject()
+        })
+
+        //funksjon for å tracke tasteklikk for hver "s","c","r" taster og funker helt like i de oppe
+        //Her har jeg brukt "https://www.toptal.com/developers/keycode" for å vite keycode til knappene
+        document.addEventListener("keydown", (event) => {
+            if (event.keyCode === 83) {
+                generateObject("square", squareNumber += 1, "squareCount")
+            }
+            if (event.keyCode === 67) {
+                generateObject("circle", circleNumber += 1, "circleCount")
+            }
+            if (event.keyCode === 82) {
+                deleteRandomObject()
+            }
+        })
+
+        //TODO: Count the element types and total and print to interface
+        let squareNumber = 1;
+        let circleNumber = 1;
+        let total = squareNumber + circleNumber
+        let timer = 0
+        let elementAddedPerSecond = 0
+        document.getElementById("squareCount").innerText = squareNumber
+        document.getElementById("circleCount").innerText = circleNumber
+        document.getElementById("totalCount").innerText = total
+
+        //denne funksjon opdaterer tallet til variabler
+        function updateVariableNumber(variable,id){
+            document.getElementById(id).innerText=variable
+        }
+
+        //denne funksjon opdaterer total elementer
+        function updateTotalNumber() {
+            let total = squareNumber + circleNumber
+            document.getElementById("totalCount").innerText = total
+        }
+
+        //denne funksjon teller opp hvert sekund og kalkulerer antall elementer per sekund
+        //Jeg har brukt Chat gpt her for å vite kalkulasjon formula for antall elementer per sekund og hvordan skal jeg skrive det i javascript
+        setInterval(()=>{
+            updateVariableNumber(timer+=1,"timer")
+            //opdaterer antall elementer per sekund 
+            //koden fra chat chpt etter jeg har gjordt test i chat gpt
+            let elementAddedThisSecond = elementAddedPerSecond
+            elementAddedPerSecond = 0
+            let avgPerSec = elementAddedThisSecond / timer / 1000
+            document.getElementById("avgPersec").innerText = avgPerSec.toFixed(10)
+        },1000)
+
+        //Function to draw on canvas:
+        function renderDrawings() {
+            //Clear the rectangle
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            //TODO: Draw the elements on canvas:
+            //bruker map for å få nøyaktig ting
+            elements.map((info) => {
+                let type = info.type
+                let x = info.x
+                let y = info.y
+                //her skjekker om det er square eller circle i elements array og tegner ut det objekt
+                if (type === "square") {
+                    //her tegner ut firekant
+                    ctx.fillStyle = "aqua"
+                    ctx.fillRect(x, y, 8, 8)
+                }
+                if (type === "circle") {
+                    //her tegner up sirkel
+                    // her har jeg brukte denne websiden https://www.html5canvastutorials.com/tutorials/html5-canvas-circles/ for å vite hvodan tegne sirkel
+                    ctx.beginPath();
+                    ctx.arc(x, y, 13, 0, 2 * Math.PI)
+                    ctx.fillStyle = "yellow"
+                    ctx.fill();
+                }
+
+            })
+
+
+            //Testprint:
+            console.log("Currently drawing frames...")
+            //Use requestAnimationFrame to re-run renderDrawings-function
+            requestAnimationFrame(renderDrawings)
+        }
+        //Start drawing
+        renderDrawings()
+    </script>
+</body>
+
+</html>
